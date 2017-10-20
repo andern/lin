@@ -13,14 +13,14 @@ func (p Poly) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 func (p Poly) Less(i, j int) bool { return p[i].Var < p[j].Var }
 
 // Add adds a polynomial to another polynomial without simplifying the result
-func (p Poly) Add(p2 Poly) Poly {
-	return append(p, p2...)
+func (p Poly) Add(poly Poly) Poly {
+	return append(p, poly...)
 }
 
 // Sub subtracts a polynomial to another
 // polynomial without simplifying the result
-func (p Poly) Sub(p2 Poly) Poly {
-	return p.Add(p2.Negate())
+func (p Poly) Sub(poly Poly) Poly {
+	return p.Add(poly.Negate())
 }
 
 // Simplify simplifies a polynomial by combining
@@ -43,4 +43,19 @@ func (p Poly) Negate() Poly {
 		p[i] = term.Negate()
 	}
 	return p
+}
+
+// Compose substitutes a variable in p with the given poly
+func (p Poly) Compose(variable string, poly Poly) (res Poly) {
+	for _, t := range p {
+		if t.Var != variable {
+			res = append(res, t)
+			continue
+		}
+		for _, term := range poly {
+			term.Coeff = term.Coeff.Mul(t.Coeff)
+			res = append(res, term)
+		}
+	}
+	return
 }

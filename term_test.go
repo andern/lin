@@ -21,6 +21,10 @@ func TestWhatever(t *testing.T) {
 	fmt.Println(p)
 	fmt.Println(p.Simplify())
 	fmt.Println(p.Simplify().Negate())
+	p2 := a.Add(b).Add(b)
+	fmt.Println(p2)
+	fmt.Println(p2.Compose("b", a))
+	fmt.Println(p2.Compose("b", a).Simplify())
 }
 
 func BenchmarkFracFmt(b *testing.B) {
