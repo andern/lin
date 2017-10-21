@@ -66,10 +66,10 @@ func (p Poly) String() string {
 	var b bytes.Buffer
 
 	for i, term := range p {
-		if i == 0 && !term.Coeff.Neg {
-			b.WriteString(term.Format("%.0s%v/%v %s"))
+		if i == 0 && !term.Coeff.IsNeg() {
+			b.WriteString(term.Format("%.0s%v %s"))
 		} else {
-			b.WriteString(term.Format("%s %v/%v %s"))
+			b.WriteString(term.Format("%s %v %s"))
 		}
 
 		if i < len(p)-1 {

@@ -2,26 +2,32 @@ package lin
 
 import (
 	"fmt"
-
-	"github.com/andern/frac"
 )
+
+type Num interface {
+	IsNeg() bool
+	Negate() Num
+	Mul(Num) Num
+	Add(Num) Num
+	Sub(Num) Num
+}
 
 // A Term without Var is a constant
 type Term struct {
-	Coeff frac.Frac64
+	Coeff Num
 	Var   string
 }
 
 func (t Term) Format(format string) string {
 	sign := "+"
-	if t.Coeff.Neg {
+	if t.Coeff.IsNeg() {
 		sign = "-"
 	}
-	return fmt.Sprintf(format, sign, t.Coeff.Num, t.Coeff.Den, t.Var)
+	return fmt.Sprintf(format, sign, t.Coeff, t.Var)
 }
 
 func (t Term) String() string {
-	return t.Format("%s %v/%v %s")
+	return t.Format("%s %v %s")
 }
 
 func (t Term) AsPoly() Poly {

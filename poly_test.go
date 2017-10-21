@@ -10,13 +10,23 @@ import (
 	"github.com/andern/frac"
 )
 
+type Frac frac.Frac64
+
+// Implement Num
+func (f Frac) IsNeg() bool    { return f.Neg }
+func (f Frac) Negate() Num    { return f.Negate() }
+func (f Frac) Mul(v Num) Num  { return f.Mul(v) }
+func (f Frac) Add(v Num) Num  { return f.Add(v) }
+func (f Frac) Sub(v Num) Num  { return f.Sub(v) }
+func (f Frac) String() string { return fmt.Sprintf("%v/%v", f.Num, f.Den) }
+
 type testPoly struct {
 	In  Poly
 	Out string
 }
 
 var polyTests = []testPoly{
-	{Poly([]Term{{frac.Frac64{2, 1, false}, "x"}, {frac.Frac64{5, 1, true}, "y"}}), "2/1 x - 5/1 y"},
+	{Poly([]Term{{Frac{2, 1, false}, "x"}, {Frac{5, 1, true}, "y"}}), "2/1 x - 5/1 y"},
 }
 
 func TestString(t *testing.T) {
@@ -34,7 +44,7 @@ func BenchmarkString(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		var p Poly
 		for m := 0; m < r.Int()%10; m++ {
-			f := frac.Frac64{r.Uint64(), r.Uint64(), randBool(r)}
+			f := Frac{r.Uint64(), r.Uint64(), randBool(r)}
 			term := Term{f, "x"}
 			p = append(p, term)
 		}
