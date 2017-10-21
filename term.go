@@ -27,8 +27,3 @@ func (t Term) String() string {
 func (t Term) AsPoly() Poly {
 	return Poly([]Term{t})
 }
-
-func (t Term) Negate() Term {
-	t.Coeff = t.Coeff.Negate()
-	return t
-}

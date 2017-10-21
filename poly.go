@@ -1,6 +1,7 @@
 package lin
 
 import (
+	"bytes"
 	"sort"
 )
 
@@ -38,9 +39,10 @@ func (p Poly) Simplify() (res Poly) {
 	return
 }
 
+// Negate negates all terms in the polynomial
 func (p Poly) Negate() Poly {
-	for i, term := range p {
-		p[i] = term.Negate()
+	for i, _ := range p {
+		p[i].Coeff = p[i].Coeff.Negate()
 	}
 	return p
 }
@@ -58,4 +60,21 @@ func (p Poly) Compose(variable string, poly Poly) (res Poly) {
 		}
 	}
 	return
+}
+
+func (p Poly) String() string {
+	var b bytes.Buffer
+
+	for i, term := range p {
+		if i == 0 && !term.Coeff.Neg {
+			b.WriteString(term.Format("%.0s%v/%v %s"))
+		} else {
+			b.WriteString(term.Format("%s %v/%v %s"))
+		}
+
+		if i < len(p)-1 {
+			b.WriteString(" ")
+		}
+	}
+	return b.String()
 }
