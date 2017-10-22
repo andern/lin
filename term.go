@@ -9,7 +9,6 @@ type Num interface {
 	Negate() Num
 	Mul(Num) Num
 	Add(Num) Num
-	Sub(Num) Num
 }
 
 // A Term without Var is a constant

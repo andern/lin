@@ -17,7 +17,6 @@ func (f Frac) IsNeg() bool    { return f.Neg }
 func (f Frac) Negate() Num    { return f.Negate() }
 func (f Frac) Mul(v Num) Num  { return f.Mul(v) }
 func (f Frac) Add(v Num) Num  { return f.Add(v) }
-func (f Frac) Sub(v Num) Num  { return f.Sub(v) }
 func (f Frac) String() string { return fmt.Sprintf("%v/%v", f.Num, f.Den) }
 
 type testPoly struct {
