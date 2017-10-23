@@ -6,6 +6,7 @@ import (
 
 type Num interface {
 	IsNeg() bool
+	IsOne() bool
 	Negate() Num
 	Mul(Num) Num
 	Add(Num) Num

@@ -66,15 +66,23 @@ func (p Poly) String() string {
 	var b bytes.Buffer
 
 	for i, term := range p {
-		if i == 0 && !term.Coeff.IsNeg() {
-			b.WriteString(term.Format("%.0s%v %s"))
-		} else {
-			b.WriteString(term.Format("%s %v %s"))
-		}
+		fmt := polyFormat(i, term)
+		b.WriteString(term.Format(fmt))
 
 		if i < len(p)-1 {
 			b.WriteString(" ")
 		}
 	}
 	return b.String()
+}
+
+func polyFormat(idx int, t Term) string {
+	str := "%s"
+	if idx == 0 && !t.Coeff.IsNeg() {
+		str = "%.0s"
+	}
+	if t.Coeff.IsOne() {
+		return str + "%.0v %s"
+	}
+	return str + "%v %s"
 }

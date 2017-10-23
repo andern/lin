@@ -3,24 +3,16 @@ package lin
 type Equality string
 
 const (
-	GreaterThan        Equality = ">"
-	GreaterThanOrEqual          = ">="
-	Equal                       = "="
+	Equal              Equality = "="
 	NotEqual                    = "!="
+	GreaterThan                 = ">"
+	GreaterThanOrEqual          = ">="
 	LessThan                    = "<"
 	LessThanOrEqual             = "<="
 )
 
 type Expression struct {
 	LHS Poly
-	RHS Poly
-}
-
-type Equation struct {
-	Expression
-}
-
-type Inequality struct {
-	Expression
 	Equality
+	RHS Poly
 }
