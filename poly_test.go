@@ -14,6 +14,7 @@ type Frac frac.Frac64
 
 // Implement Num
 func (f Frac) IsNeg() bool    { return f.Neg }
+func (f Frac) IsOne() bool    { return f.Num == f.Den }
 func (f Frac) Negate() Num    { return f.Negate() }
 func (f Frac) Mul(v Num) Num  { return f.Mul(v) }
 func (f Frac) Add(v Num) Num  { return f.Add(v) }
@@ -25,7 +26,7 @@ type testPoly struct {
 }
 
 var polyTests = []testPoly{
-	{Poly([]Term{{Frac{2, 1, false}, "x"}, {Frac{5, 1, true}, "y"}}), "2/1 x - 5/1 y"},
+	{Poly([]Term{{Frac{2, 1, false}, "x"}, {Frac{5, 1, true}, "y"}}), "2/1x - 5/1y"},
 }
 
 func TestString(t *testing.T) {

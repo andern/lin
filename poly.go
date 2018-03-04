@@ -66,7 +66,7 @@ func (p Poly) String() string {
 	var b bytes.Buffer
 
 	for i, term := range p {
-		fmt := polyFormat(i, term)
+		fmt := termFormat(i, term)
 		b.WriteString(term.Format(fmt))
 
 		if i < len(p)-1 {
@@ -76,13 +76,21 @@ func (p Poly) String() string {
 	return b.String()
 }
 
-func polyFormat(idx int, t Term) string {
-	str := "%s"
+func termFormat(idx int, t Term) string {
+	sign := "%s"
+	coef := "%v"
+	vari := "%s"
+
 	if idx == 0 && !t.Coeff.IsNeg() {
-		str = "%.0s"
+		sign = "%.0s"
 	}
-	if t.Coeff.IsOne() {
-		return str + "%.0v %s"
+
+	if t.Coeff.IsOne() && t.Var != "" {
+		coef = "%.0v"
 	}
-	return str + "%v %s"
+
+	if idx == 0 {
+		return sign + coef + vari
+	}
+	return sign + " " + coef + vari
 }
