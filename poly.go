@@ -34,7 +34,9 @@ func (p Poly) Simplify() (res Poly) {
 		for ; i+1 < len(p) && term.Var == p[i+1].Var; i++ {
 			term.Coeff = term.Coeff.Add(p[i+1].Coeff)
 		}
-		res = append(res, term)
+		if !term.Coeff.IsZero() {
+			res = append(res, term)
+		}
 	}
 	return
 }

@@ -14,6 +14,7 @@ type Frac frac.Frac64
 
 // Implement Num
 func (f Frac) IsNeg() bool   { return f.Neg }
+func (f Frac) IsZero() bool  { return f.Num == 0 }
 func (f Frac) IsOne() bool   { return f.Num == f.Den }
 func (f Frac) Negate() Num   { return f.Negate() }
 func (f Frac) Mul(v Num) Num { return f.Mul(v) }
