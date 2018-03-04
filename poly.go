@@ -77,7 +77,7 @@ func (p Poly) String() string {
 }
 
 func termFormat(idx int, t Term) string {
-	sign := "%s"
+	sign := "%s "
 	coef := "%v"
 	vari := "%s"
 
@@ -89,8 +89,5 @@ func termFormat(idx int, t Term) string {
 		coef = "%.0v"
 	}
 
-	if idx == 0 {
-		return sign + coef + vari
-	}
-	return sign + " " + coef + vari
+	return sign + coef + vari
 }

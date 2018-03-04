@@ -13,12 +13,18 @@ import (
 type Frac frac.Frac64
 
 // Implement Num
-func (f Frac) IsNeg() bool    { return f.Neg }
-func (f Frac) IsOne() bool    { return f.Num == f.Den }
-func (f Frac) Negate() Num    { return f.Negate() }
-func (f Frac) Mul(v Num) Num  { return f.Mul(v) }
-func (f Frac) Add(v Num) Num  { return f.Add(v) }
-func (f Frac) String() string { return fmt.Sprintf("%v/%v", f.Num, f.Den) }
+func (f Frac) IsNeg() bool   { return f.Neg }
+func (f Frac) IsOne() bool   { return f.Num == f.Den }
+func (f Frac) Negate() Num   { return f.Negate() }
+func (f Frac) Mul(v Num) Num { return f.Mul(v) }
+func (f Frac) Add(v Num) Num { return f.Add(v) }
+
+func (f Frac) String() string {
+	if f.Den == 1 {
+		return fmt.Sprintf("%v", f.Num)
+	}
+	return fmt.Sprintf("%v/%v", f.Num, f.Den)
+}
 
 type testPoly struct {
 	In  Poly
@@ -26,7 +32,9 @@ type testPoly struct {
 }
 
 var polyTests = []testPoly{
-	{Poly([]Term{{Frac{2, 1, false}, "x"}, {Frac{5, 1, true}, "y"}}), "2/1x - 5/1y"},
+	{Poly([]Term{{Frac{2, 3, false}, "x"}, {Frac{5, 3, true}, "y"}}), "2/3x - 5/3y"},
+	{Poly([]Term{{Frac{2, 2, true}, "e"}, {Frac{4, 4, false}, "pi"}}), "- e + pi"},
+	{Poly([]Term{{Frac{5, 1, true}, "e"}, {Frac{4, 1, false}, "pi"}}), "- 5e + 4pi"},
 }
 
 func TestString(t *testing.T) {
