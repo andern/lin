@@ -3,44 +3,67 @@ package lin
 import (
 	"errors"
 	"fmt"
+	"math/big"
 	"math/rand"
 	"testing"
 	"time"
-
-	"github.com/andern/frac"
 )
 
-type Frac frac.Frac64
-
-// Implement Num
-func (f Frac) IsNeg() bool   { return f.Neg }
-func (f Frac) IsZero() bool  { return f.Num == 0 }
-func (f Frac) IsOne() bool   { return f.Num == f.Den }
-func (f Frac) Negate() Num   { return f.Negate() }
-func (f Frac) Mul(v Num) Num { return f.Mul(v) }
-func (f Frac) Add(v Num) Num { return f.Add(v) }
-
-func (f Frac) String() string {
-	if f.Den == 1 {
-		return fmt.Sprintf("%v", f.Num)
-	}
-	return fmt.Sprintf("%v/%v", f.Num, f.Den)
-}
-
-type testPoly struct {
+type stringTest struct {
 	In  Poly
 	Out string
 }
 
-var polyTests = []testPoly{
-	{Poly([]Term{{Frac{2, 3, false}, "x"}, {Frac{5, 3, true}, "y"}}), "2/3x - 5/3y"},
-	{Poly([]Term{{Frac{2, 2, true}, "e"}, {Frac{4, 4, false}, "pi"}}), "- e + pi"},
-	{Poly([]Term{{Frac{5, 1, true}, "e"}, {Frac{4, 1, false}, "pi"}}), "- 5e + 4pi"},
+var stringTests = []stringTest{
+	{Poly([]Term{{*big.NewRat(2, 3), "x"}, {*big.NewRat(-5, 3), "y"}}), "2/3x - 5/3y"},
+	{Poly([]Term{{*big.NewRat(-2, 2), "e"}, {*big.NewRat(4, 4), "pi"}}), "- e + pi"},
+	{Poly([]Term{{*big.NewRat(-5, 1), "e"}, {*big.NewRat(4, 1), "pi"}}), "- 5e + 4pi"},
 }
 
 func TestString(t *testing.T) {
-	for _, test := range polyTests {
+	for _, test := range stringTests {
 		str := test.In.String()
+		err := checkOutput(str, test.Out)
+		if err != nil {
+			t.Error(err)
+		}
+	}
+}
+
+var negateTests = []stringTest{
+	{Poly([]Term{{*big.NewRat(2, 3), "x"}, {*big.NewRat(-5, 3), "y"}}), "- 2/3x + 5/3y"},
+	{Poly([]Term{{*big.NewRat(-2, 2), "e"}, {*big.NewRat(4, 4), "pi"}}), "e - pi"},
+	{Poly([]Term{{*big.NewRat(-5, 1), "e"}, {*big.NewRat(4, 1), "pi"}}), "5e - 4pi"},
+}
+
+func TestNegate(t *testing.T) {
+	for _, test := range negateTests {
+		str := test.In.Negate().String()
+		err := checkOutput(str, test.Out)
+		if err != nil {
+			t.Error(err)
+		}
+	}
+}
+
+var simplifyTests = []stringTest{
+	{Poly([]Term{
+		{*big.NewRat(2, 3), "x"},
+		{*big.NewRat(-5, 3), "y"},
+		{*big.NewRat(3, 1), "x"},
+		{*big.NewRat(3, 1), "y"},
+	}), "11/3x + 4/3y"},
+
+	{Poly([]Term{
+		{*big.NewRat(2, 3), "x"},
+		{*big.NewRat(-5, 3), "y"},
+		{*big.NewRat(3, 1), "x"},
+	}), "11/3x - 5/3y"},
+}
+
+func TestSimplify(t *testing.T) {
+	for _, test := range simplifyTests {
+		str := test.In.Simplify().String()
 		err := checkOutput(str, test.Out)
 		if err != nil {
 			t.Error(err)
@@ -53,8 +76,8 @@ func BenchmarkString(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		var p Poly
 		for m := 0; m < r.Int()%10; m++ {
-			f := Frac{r.Uint64(), r.Uint64(), randBool(r)}
-			term := Term{f, "x"}
+			f := big.NewRat(r.Int63(), r.Int63())
+			term := Term{*f, "x"}
 			p = append(p, term)
 		}
 		p.String()
