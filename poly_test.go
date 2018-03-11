@@ -3,21 +3,53 @@ package lin
 import (
 	"errors"
 	"fmt"
-	"math/big"
 	"math/rand"
+	"strconv"
 	"testing"
 	"time"
 )
+
+type NumInt int64
+
+func (a NumInt) IsSingle() bool { return a == 1 || a == -1 }
+func (a NumInt) Add(b Num) Num  { return a + b.(NumInt) }
+func (a NumInt) Mul(b Num) Num  { return a * b.(NumInt) }
+func (a NumInt) Negate() Num    { return -a }
+func (a NumInt) String() string { return strconv.FormatInt(int64(a), 10) }
+func (a NumInt) Sign() int {
+	if a > 0 {
+		return 1
+	}
+	if a < 0 {
+		return -1
+	}
+	return 0
+}
+func (a NumInt) Abs() Num {
+	if a < 0 {
+		return -a
+	}
+	return a
+}
 
 type stringTest struct {
 	In  Poly
 	Out string
 }
 
+func newStringTest(expect string, in ...string) stringTest {
+	var p Poly
+	for i := 0; i < len(in); i = i + 2 {
+		val, _ := strconv.ParseInt(in[i], 10, 64)
+		p = append(p, Term{NumInt(val), in[i+1]})
+	}
+	return stringTest{p, expect}
+}
+
 var stringTests = []stringTest{
-	{Poly([]Term{{*big.NewRat(2, 3), "x"}, {*big.NewRat(-5, 3), "y"}}), "2/3x - 5/3y"},
-	{Poly([]Term{{*big.NewRat(-2, 2), "e"}, {*big.NewRat(4, 4), "pi"}}), "- e + pi"},
-	{Poly([]Term{{*big.NewRat(-5, 1), "e"}, {*big.NewRat(4, 1), "pi"}}), "- 5e + 4pi"},
+	newStringTest("2x - 5y", "2", "x", "-5", "y"),
+	newStringTest("- e + pi", "-1", "e", "1", "pi"),
+	newStringTest("- 5e + 4pi", "-5", "e", "4", "pi"),
 }
 
 func TestString(t *testing.T) {
@@ -31,9 +63,9 @@ func TestString(t *testing.T) {
 }
 
 var negateTests = []stringTest{
-	{Poly([]Term{{*big.NewRat(2, 3), "x"}, {*big.NewRat(-5, 3), "y"}}), "- 2/3x + 5/3y"},
-	{Poly([]Term{{*big.NewRat(-2, 2), "e"}, {*big.NewRat(4, 4), "pi"}}), "e - pi"},
-	{Poly([]Term{{*big.NewRat(-5, 1), "e"}, {*big.NewRat(4, 1), "pi"}}), "5e - 4pi"},
+	newStringTest("- 2x + 5y", "2", "x", "-5", "y"),
+	newStringTest("e - pi", "-1", "e", "1", "pi"),
+	newStringTest("5e - 4pi", "-5", "e", "4", "pi"),
 }
 
 func TestNegate(t *testing.T) {
@@ -47,18 +79,8 @@ func TestNegate(t *testing.T) {
 }
 
 var simplifyTests = []stringTest{
-	{Poly([]Term{
-		{*big.NewRat(2, 3), "x"},
-		{*big.NewRat(-5, 3), "y"},
-		{*big.NewRat(3, 1), "x"},
-		{*big.NewRat(3, 1), "y"},
-	}), "11/3x + 4/3y"},
-
-	{Poly([]Term{
-		{*big.NewRat(2, 3), "x"},
-		{*big.NewRat(-5, 3), "y"},
-		{*big.NewRat(3, 1), "x"},
-	}), "11/3x - 5/3y"},
+	newStringTest("11x + 4y", "2", "x", "-5", "y", "9", "x", "9", "y"),
+	newStringTest("11x - 5y", "2", "x", "-5", "y", "9", "x"),
 }
 
 func TestSimplify(t *testing.T) {
@@ -71,13 +93,29 @@ func TestSimplify(t *testing.T) {
 	}
 }
 
+var composeTests = []stringTest{
+	newStringTest("4x - 10y + 18x + 18y - 5y + 18x - 45y + 81x + 81y + 9y",
+		"2", "x", "-5", "y", "9", "x", "9", "y"),
+	newStringTest("4x - 10y + 18x + 5y + 18x - 45y + 81x", "-2", "x", "5", "y", "-9", "x"),
+}
+
+func TestCompose(t *testing.T) {
+	for _, test := range composeTests {
+		str := test.In.Compose("x", test.In).String()
+		err := checkOutput(str, test.Out)
+		if err != nil {
+			t.Error(err)
+		}
+	}
+}
+
 func BenchmarkString(b *testing.B) {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	for n := 0; n < b.N; n++ {
 		var p Poly
 		for m := 0; m < r.Int()%10; m++ {
-			f := big.NewRat(r.Int63(), r.Int63())
-			term := Term{*f, "x"}
+			f := r.Int63()
+			term := Term{NumInt(f), "x"}
 			p = append(p, term)
 		}
 		p.String()

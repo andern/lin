@@ -32,7 +32,7 @@ func (p Poly) Simplify() (res Poly) {
 	for i := 0; i < len(p); i++ {
 		term := p[i]
 		for ; i+1 < len(p) && term.Var == p[i+1].Var; i++ {
-			term.Coeff.Add(&term.Coeff, &p[i+1].Coeff)
+			term.Coeff = term.Coeff.Add(p[i+1].Coeff)
 		}
 		if term.Coeff.Sign() != 0 {
 			res = append(res, term)
@@ -44,8 +44,7 @@ func (p Poly) Simplify() (res Poly) {
 // Negate negates all terms in the polynomial
 func (p Poly) Negate() Poly {
 	for i, _ := range p {
-		p[i].Coeff.Neg(&p[i].Coeff)
-		//		p[i].Coeff = *p[i].Coeff.Neg(p[i].Coeff)
+		p[i].Coeff = p[i].Coeff.Negate()
 	}
 	return p
 }
@@ -58,8 +57,7 @@ func (p Poly) Compose(variable string, poly Poly) (res Poly) {
 			continue
 		}
 		for _, term := range poly {
-			term.Coeff.Mul(&term.Coeff, &t.Coeff)
-			//			term.Coeff = term.Coeff.Mul(t.Coeff)
+			term.Coeff = term.Coeff.Mul(t.Coeff)
 			res = append(res, term)
 		}
 	}
@@ -78,20 +76,3 @@ func (p Poly) String() string {
 	}
 	return b.String()
 }
-
-/*
-func termFormat(idx int, t Term) string {
-	sign := "%s "
-	coef := "%v"
-	vari := "%s"
-
-	if idx == 0 && t.Coeff.Sign() == 1 {
-		sign = "%.0s"
-	}
-
-	if t.IsOne() && !t.IsConstant() {
-		coef = "%.0r"
-	}
-
-	return sign + coef + vari
-} */
