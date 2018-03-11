@@ -9,29 +9,6 @@ import (
 	"time"
 )
 
-type NumInt int64
-
-func (a NumInt) IsSingle() bool { return a == 1 || a == -1 }
-func (a NumInt) Add(b Num) Num  { return a + b.(NumInt) }
-func (a NumInt) Mul(b Num) Num  { return a * b.(NumInt) }
-func (a NumInt) Negate() Num    { return -a }
-func (a NumInt) String() string { return strconv.FormatInt(int64(a), 10) }
-func (a NumInt) Sign() int {
-	if a > 0 {
-		return 1
-	}
-	if a < 0 {
-		return -1
-	}
-	return 0
-}
-func (a NumInt) Abs() Num {
-	if a < 0 {
-		return -a
-	}
-	return a
-}
-
 type stringTest struct {
 	In  Poly
 	Out string
@@ -41,7 +18,7 @@ func newStringTest(expect string, in ...string) stringTest {
 	var p Poly
 	for i := 0; i < len(in); i = i + 2 {
 		val, _ := strconv.ParseInt(in[i], 10, 64)
-		p = append(p, Term{NumInt(val), in[i+1]})
+		p = append(p, Term{IntCoeff(val), in[i+1]})
 	}
 	return stringTest{p, expect}
 }
@@ -115,7 +92,7 @@ func BenchmarkString(b *testing.B) {
 		var p Poly
 		for m := 0; m < r.Int()%10; m++ {
 			f := r.Int63()
-			term := Term{NumInt(f), "x"}
+			term := Term{IntCoeff(f), "x"}
 			p = append(p, term)
 		}
 		p.String()
