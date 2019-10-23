@@ -1,8 +1,6 @@
 package lin
 
 import (
-	"errors"
-	"fmt"
 	"math/rand"
 	"strconv"
 	"testing"
@@ -10,11 +8,11 @@ import (
 )
 
 type stringTest struct {
-	In  Poly
+	In  interface{}
 	Out string
 }
 
-func newStringTest(expect string, in ...string) stringTest {
+func newPolyTest(expect string, in ...string) stringTest {
 	var p Poly
 	for i := 0; i < len(in); i = i + 2 {
 		val, _ := strconv.ParseInt(in[i], 10, 64)
@@ -24,65 +22,54 @@ func newStringTest(expect string, in ...string) stringTest {
 }
 
 var stringTests = []stringTest{
-	newStringTest("2x - 5y", "2", "x", "-5", "y"),
-	newStringTest("- e + pi", "-1", "e", "1", "pi"),
-	newStringTest("- 5e + 4pi", "-5", "e", "4", "pi"),
+	newPolyTest("2x - 5y", "2", "x", "-5", "y"),
+	newPolyTest("- e + pi", "-1", "e", "1", "pi"),
+	newPolyTest("- 5e + 4pi", "-5", "e", "4", "pi"),
 }
 
 func TestString(t *testing.T) {
 	for _, test := range stringTests {
-		str := test.In.String()
-		err := checkOutput(str, test.Out)
-		if err != nil {
-			t.Error(err)
-		}
+		str := test.In.(Poly).String()
+		assertEquals(t, str, test.Out)
 	}
 }
 
 var negateTests = []stringTest{
-	newStringTest("- 2x + 5y", "2", "x", "-5", "y"),
-	newStringTest("e - pi", "-1", "e", "1", "pi"),
-	newStringTest("5e - 4pi", "-5", "e", "4", "pi"),
+	newPolyTest("- 2x + 5y", "2", "x", "-5", "y"),
+	newPolyTest("e - pi", "-1", "e", "1", "pi"),
+	newPolyTest("5e - 4pi", "-5", "e", "4", "pi"),
 }
 
 func TestNegate(t *testing.T) {
 	for _, test := range negateTests {
-		str := test.In.Negate().String()
-		err := checkOutput(str, test.Out)
-		if err != nil {
-			t.Error(err)
-		}
+		str := test.In.(Poly).Negate().String()
+		assertEquals(t, str, test.Out)
 	}
 }
 
 var simplifyTests = []stringTest{
-	newStringTest("11x + 4y", "2", "x", "-5", "y", "9", "x", "9", "y"),
-	newStringTest("11x - 5y", "2", "x", "-5", "y", "9", "x"),
+	newPolyTest("11x + 4y", "2", "x", "-5", "y", "9", "x", "9", "y"),
+	newPolyTest("11x - 5y", "2", "x", "-5", "y", "9", "x"),
 }
 
 func TestSimplify(t *testing.T) {
 	for _, test := range simplifyTests {
-		str := test.In.Simplify().String()
-		err := checkOutput(str, test.Out)
-		if err != nil {
-			t.Error(err)
-		}
+		str := test.In.(Poly).Simplify().String()
+		assertEquals(t, str, test.Out)
 	}
 }
 
 var composeTests = []stringTest{
-	newStringTest("4x - 10y + 18x + 18y - 5y + 18x - 45y + 81x + 81y + 9y",
+	newPolyTest("4x - 10y + 18x + 18y - 5y + 18x - 45y + 81x + 81y + 9y",
 		"2", "x", "-5", "y", "9", "x", "9", "y"),
-	newStringTest("4x - 10y + 18x + 5y + 18x - 45y + 81x", "-2", "x", "5", "y", "-9", "x"),
+	newPolyTest("4x - 10y + 18x + 5y + 18x - 45y + 81x", "-2", "x", "5", "y", "-9", "x"),
 }
 
 func TestCompose(t *testing.T) {
 	for _, test := range composeTests {
-		str := test.In.Compose("x", test.In).String()
-		err := checkOutput(str, test.Out)
-		if err != nil {
-			t.Error(err)
-		}
+		poly := test.In.(Poly)
+		str := poly.Compose("x", poly).String()
+		assertEquals(t, str, test.Out)
 	}
 }
 
@@ -99,11 +86,10 @@ func BenchmarkString(b *testing.B) {
 	}
 }
 
-func checkOutput(got, expect string) error {
-	if got == expect {
-		return nil
+func assertEquals(t *testing.T, got, expect interface{}) {
+	if got != expect {
+		t.Errorf("got (%s), expected (%s)", got, expect)
 	}
-	return errors.New(fmt.Sprintf("got (%s), expected (%s)", got, expect))
 }
 
 func randBool(r *rand.Rand) bool {

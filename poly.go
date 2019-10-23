@@ -8,6 +8,10 @@ import (
 // A Poly represents a linear polynomial
 type Poly []Term
 
+func NewPoly(t Term) Poly {
+	return Poly([]Term{t})
+}
+
 // Poly implements sort.Interface
 func (p Poly) Len() int           { return len(p) }
 func (p Poly) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
@@ -43,7 +47,7 @@ func (p Poly) Simplify() (res Poly) {
 
 // Negate negates all terms in the polynomial
 func (p Poly) Negate() Poly {
-	for i, _ := range p {
+	for i := range p {
 		p[i].Coeff = p[i].Coeff.Negate()
 	}
 	return p

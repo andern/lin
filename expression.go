@@ -17,7 +17,6 @@ type Expression struct {
 	RHS Poly
 }
 
-/*
 // Compose substitutes a variable in e with the given poly
 func (e *Expression) Compose(variable string, poly Poly) (res Expression) {
 	res.LHS = e.LHS.Compose(variable, poly)
@@ -37,8 +36,8 @@ func (e *Expression) Simplify() Expression {
 	for _, l := range e.LHS.Simplify() {
 		for _, r := range e.RHS.Simplify() {
 			if l.Var == r.Var {
-				lhs.Sub(r.AsPoly())
-				rhs.Sub(r.AsPoly())
+				lhs.Sub(NewPoly(r))
+				rhs.Sub(NewPoly(r))
 			}
 		}
 	}
@@ -52,4 +51,4 @@ func (e *Expression) SimplifyToLHS() Expression {
 		e.Equality,
 		Term{}.AsPoly(),
 	}
-} */
+}

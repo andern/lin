@@ -10,10 +10,14 @@ type Term struct {
 }
 
 func (t Term) IsConstant() bool {
-	return t.Var == ""
+	return t.Coeff.Sign() == 0 || t.Var == ""
 }
 
 func (t Term) Format(leftmost bool) string {
+	if t.Coeff.Sign() == 0 {
+		return ""
+	}
+
 	sign := "+"
 	if t.Coeff.Sign() == -1 {
 		sign = "-"
