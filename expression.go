@@ -49,6 +49,6 @@ func (e *Expression) SimplifyToLHS() Expression {
 	return Expression{
 		e.LHS.Sub(e.RHS).Simplify(),
 		e.Equality,
-		Term{}.AsPoly(),
+		NewPoly(Term{}),
 	}
 }

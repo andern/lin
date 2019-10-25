@@ -30,10 +30,6 @@ func (t Term) String() string {
 	return t.Format(false)
 }
 
-func (t Term) AsPoly() Poly {
-	return Poly([]Term{t})
-}
-
 // leftmost denotes whether it's the first (leftmost) term in a series of terms
 func (t Term) formatString(leftmost bool) string {
 	sign := "%s "
